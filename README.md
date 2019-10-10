@@ -3,7 +3,8 @@
 
 **CeReDe** is opensource remote desktop. it`s like _**Team Viewer**_, _**AnyDesk**_, the different is you need costumize and provide your own server. base in what you need.
 
-its 2.0 because I used RMI to speed up and minimized consumed data. for old version
+its 2.0 because I used RMI to speed up and minimized consumed data, although same class but a lot different in logic.
+for old version
 [Cerede 1](https://github.com/mayforever/cerede).
 
 **ceredeserver** is the serverside of this project. it handled username, password, address, and command of every client.
