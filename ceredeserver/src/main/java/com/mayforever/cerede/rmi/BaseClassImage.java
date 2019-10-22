@@ -4,6 +4,7 @@ import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.HashMap;
 
+import com.mayforever.cerede.data.TCPData;
 import com.mayforever.ceredeserver.Launcher;
 
 public class BaseClassImage  extends UnicastRemoteObject implements BaseImageInterface{
@@ -33,6 +34,32 @@ public class BaseClassImage  extends UnicastRemoteObject implements BaseImageInt
 	public void addChangeColumns(String key, HashMap<Short, HashMap<Short, Integer>> value) {
 		// TODO Auto-generated method stub
 		Launcher.rmiImageServer.mapChangesColumn.put(key, value);
+	}
+	
+//	public String getClipboard(String key) {
+//		return Launcher.rmiImageServer.mapClipboardText.get(key);
+//	}
+//	
+//	public void addClipboard(String key, String value) {
+//		Launcher.rmiImageServer.mapClipboardText.put(key, value);
+//	}
+
+	@Override
+	public HashMap<String, TCPData> getRemoteList() {
+		// TODO Auto-generated method stub
+		return Launcher.controllerMap;
+	}
+
+	@Override
+	public String getClipboard(String key) {
+		// TODO Auto-generated method stub
+		return Launcher.rmiImageServer.mapClipboardText.get(key);
+	}
+
+	@Override
+	public void addClipboard(String key, String value) {
+		// TODO Auto-generated method stub
+		Launcher.rmiImageServer.mapClipboardText.put(key, value);
 	}
 
 }

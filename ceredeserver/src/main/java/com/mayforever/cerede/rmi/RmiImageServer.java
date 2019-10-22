@@ -24,6 +24,7 @@ public class RmiImageServer{
 	
 	public RmiImageServer(int port, String ip) {
 		mapChangesColumn = new HashMap<>();
+		mapClipboardText = new HashMap<String, String>();
 		BaseClassImage baseClassImage;
 		
 		try {
@@ -43,7 +44,8 @@ public class RmiImageServer{
 		
 	}
 
-	public  HashMap<String, HashMap<Short, HashMap<Short, Integer>>> mapChangesColumn = null;
+	public HashMap<String, HashMap<Short, HashMap<Short, Integer>>> mapChangesColumn = null;
+	public HashMap<String, String> mapClipboardText = null;
 	/**
 	 * 
 	 */

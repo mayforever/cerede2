@@ -7,10 +7,10 @@ import java.util.Arrays;
 
 import org.apache.log4j.Logger;
 
+import com.mayforever.cerede.data.TCPData;
 import com.mayforever.cerede.protocol.AccessRequest;
 import com.mayforever.cerede.protocol.AccessResponse;
 import com.mayforever.ceredeserver.Launcher;
-import com.mayforever.ceredeserver.conn.data.TCPData;
 import com.mayforever.queue.Queue;
 import com.mayforever.thread.BaseThread;
 import com.mayforever.tools.BitConverter;
@@ -158,7 +158,7 @@ public class TCPClient
 		                }
 		            }
 					logger.debug("dataProcessSize length : " + dataProcessSize );
-                  }while(tempData.length > dataProcessSize);
+                  }while(tempData.length >= dataProcessSize);
 //                  System.out.println(tempData.length);
               }
 			} catch (InterruptedException e) {

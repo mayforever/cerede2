@@ -11,10 +11,10 @@ import org.apache.log4j.PropertyConfigurator;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.FileSystemXmlApplicationContext;
 
+import com.mayforever.cerede.data.TCPData;
 import com.mayforever.cerede.rmi.RmiImageServer;
 import com.mayforever.ceredeserver.conf.Configuration;
 import com.mayforever.ceredeserver.conn.TCPServer;
-import com.mayforever.ceredeserver.conn.data.TCPData;
 import com.mayforever.ceredeserver.session.SessionProcessor;
 import com.mayforever.queue.Queue;
 
@@ -32,6 +32,7 @@ public class Launcher
 	public static String logsConfigPath = "";
 	public static Queue<byte[]> dataProcess = null;
 	public static RmiImageServer rmiImageServer= null; 
+	
 	
 	public static void main(String[] args)
     {

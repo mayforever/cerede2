@@ -5,6 +5,7 @@ import java.util.Arrays;
 
 import org.apache.log4j.Logger;
 
+import com.mayforever.cerede.protocol.ClipboardInvoke;
 import com.mayforever.cerede.protocol.CommandRequest;
 import com.mayforever.cerede.protocol.ImageRequest;
 import com.mayforever.cerede.protocol.ImageResponse;
@@ -114,7 +115,7 @@ public class SessionProcessor extends com.mayforever.thread.BaseThread{
 					else if(data[0] ==6){
 						CommandRequest commandRequest = new CommandRequest();
 						commandRequest.fromBytes(data);
-						System.out.println(Arrays.toString(data));
+//						System.out.println(Arrays.toString(data));
 //						System.out.println(Arrays.toString(commandRequest.toBytes()));
 						if(Launcher.controllerMap.containsKey(commandRequest.getHash())) {
 							try {
@@ -133,7 +134,28 @@ public class SessionProcessor extends com.mayforever.thread.BaseThread{
 							
 						}
 					}
-					
+					else if(data[0] == 7) {
+						System.out.println(Arrays.toString(data));
+						ClipboardInvoke clipboardInvoke = new ClipboardInvoke();	
+						clipboardInvoke.fromBytes(data);
+						
+						if(Launcher.controllerMap.containsKey(clipboardInvoke.getHash())) {
+							try {
+								
+									Launcher.controllerMap.get(clipboardInvoke.getHash()).getTcpCommandListener()
+										.getTcpClient().sendPacket(data);
+								
+								
+							} catch (IOException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}catch(NullPointerException npe) {
+								
+							}
+						}else {
+							
+						}
+					}
 				}
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
