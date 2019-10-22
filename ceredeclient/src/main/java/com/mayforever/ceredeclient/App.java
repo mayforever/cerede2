@@ -45,6 +45,7 @@ public class App {
     public static Map<String, RemoteViewer> mapRemoteViewer = null;
     public static Configuration config = null;
     public static BaseImageInterface rmiClient = null;
+    public static float resizeValue = 1.5f;
     public static void main(String[]  arg0){
         ApplicationContext applicationContextLauncher = null;
         if(arg0.length == 0) {

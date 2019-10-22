@@ -6,13 +6,17 @@
 package com.mayforever.ceredeclient.conn;
 
 import com.mayforever.cerede.protocol.AccessRequest;
+import com.mayforever.cerede.protocol.ClipboardInvoke;
 import com.mayforever.cerede.protocol.Command;
 import com.mayforever.cerede.protocol.CommandRequest;
 import com.mayforever.ceredeclient.App;
+import com.mayforever.ceredeclient.device.ClipboardChanger;
 import com.mayforever.network.newtcp.TCPClient;
 import com.mayforever.queue.Queue;
 import com.mayforever.thread.BaseThread;
 import com.mayforever.tools.BitConverter;
+import java.awt.Toolkit;
+import java.awt.event.KeyEvent;
 import java.io.IOException;
 import java.nio.ByteOrder;
 import java.util.Arrays;
@@ -26,7 +30,7 @@ import org.apache.log4j.Logger;
 public class CommandClient  
     implements com.mayforever.network.newtcp.ClientListener{
     private com.mayforever.network.newtcp.TCPClient tcpClient = null;
-
+    private ClipboardChanger clipboardChanger = null;
     public TCPClient getTcpClient() {
         return tcpClient;
     }
@@ -41,6 +45,7 @@ public class CommandClient
         logger = Logger.getLogger("COMMAND CLIENT");
         dataProcess = new Queue<>();
 //        dataToValidate = new Queue<>();
+        clipboardChanger = new ClipboardChanger(Toolkit.getDefaultToolkit().getSystemClipboard());
         while(!isAlive){
             try{
             
@@ -58,7 +63,7 @@ public class CommandClient
                 }
             }
         }
-
+        
         
         this.sendAuthentication();
         logger.debug("the authentication has been sent");
@@ -94,7 +99,7 @@ public class CommandClient
             }
             logger.debug("tempData length : " + bytes.length);
             if(bytes.length < 5) {
-                 System.out.println("data break");
+//                 System.out.println("data break");
                  break;
             }else {    
                 dataProcessSize = BitConverter.bytesToInt(bytes, 1, ByteOrder.BIG_ENDIAN);
@@ -107,7 +112,7 @@ public class CommandClient
                 logger.warn("tempData is empty");
             }
             
-        }while(bytes.length > dataProcessSize );
+        }while(bytes.length >= dataProcessSize );
     }
 
     
@@ -133,6 +138,10 @@ public class CommandClient
            logger.error(ex.getMessage());
            logger.error(ex.getClass());
         }
+    }
+
+    public void sendClipboardInvoke(ClipboardInvoke clipboardInvoke) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
 //    @Override
@@ -163,18 +172,29 @@ public class CommandClient
                 try {
                     data = dataProcess.get();
                     if(data != null && data.length > 0){
-                        if  (data[0] == 6){
+                        if  (data[0] == 6){     
                             CommandRequest commandRequest = new CommandRequest();
                             logger.debug(data.length);
                             commandRequest.fromBytes(data);
-                            
+//                            if(commandRequest.getCommand() == 3){
+//                                System.out.println("PRESSED : "+data);
+//                            }
                             logger.debug(commandRequest.getTotalSize());
-                            doEvent(commandRequest);
+                            doEvent(commandRequest);    
                             logger.debug(Arrays.toString(data));
                         }else if (data[0] == 7){
+                            logger.info("Clipboard Received");
+                            ClipboardInvoke clipboardInvoke = new ClipboardInvoke();
+                            clipboardInvoke.fromBytes(data);
                             
+                            String requestorHash = clipboardInvoke.getRequestorHash();
+                            String hash = clipboardInvoke.getHash();
+                            String clipboardKey = App.toHash(requestorHash+hash);
+                            
+                            String cliboardText = App.rmiClient.getClipboard(clipboardKey);
+                            clipboardChanger.updateClipboard(cliboardText);
                         }
-                    }
+                    }       
                 } catch (InterruptedException ex) {
                     logger.warn("ERROR :"+ex.getMessage());
                     ex.printStackTrace();
@@ -194,16 +214,19 @@ public class CommandClient
         }
 
         if(command == Command.MOUSE_PRESSED){
-                App.imageClient.getRobot().mousePress(commandRequest.getParams()[0]);
+            App.imageClient.getRobot().mousePress(commandRequest.getParams()[0]);
         }else if (command == Command.MOUSE_RELEASED){
-                App.imageClient.getRobot().mouseRelease(commandRequest.getParams()[0]);
+            App.imageClient.getRobot().mouseRelease(commandRequest.getParams()[0]);
         }else if (command == Command.MOUSE_MOVE){
-                App.imageClient.getRobot().mouseMove(commandRequest.getParams()[0],
-                                commandRequest.getParams()[1]);
+            App.imageClient.getRobot().mouseMove((int) (commandRequest.getParams()[0] * App.resizeValue), 
+                        (int) (commandRequest.getParams()[1] * App.resizeValue));
         }else if (command == Command.KEY_PRESSED){
-                App.imageClient.getRobot().keyPress(commandRequest.getParams()[0]);
+            System.out.println("PRESSED : "+commandRequest.getParams()[0]);
+//              System.out.println("Must be : "+KeyEvent.VK_TAB);
+            App.imageClient.getRobot().keyPress(commandRequest.getParams()[0]);
         }else if (command == Command.KEY_RELEASED){
-                App.imageClient.getRobot().keyRelease(commandRequest.getParams()[0]);
+            System.out.println("RELEASED : "+commandRequest.getParams()[0]);
+            App.imageClient.getRobot().keyRelease(commandRequest.getParams()[0]);
         }
     }
 }

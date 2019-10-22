@@ -60,7 +60,7 @@ public class ImageClient extends BaseThread
     public void setOldBufferImage(BufferedImage oldBufferImage) {
         this.oldBufferImage = oldBufferImage;
     }
-    private float resizeValue = 1.5f;
+//    private float resizeValue = 1.5f;
 //    private ArrayList<byte[]> sendArraylistImage=null;
 //    private SessionRecieveMonitor sessionCleaner = null;
 //    private HashMap<String, byte[]> mapTempData = null;
@@ -105,8 +105,8 @@ public class ImageClient extends BaseThread
         try {
                 robot = new Robot(graphicsDevice);
                 rectangle = new Rectangle(Toolkit.getDefaultToolkit().getScreenSize());
-                this.width = (long)(rectangle.width/resizeValue);
-                this.height = (long)(rectangle.height/resizeValue);
+                this.width = (long)(Math.ceil(rectangle.width/App.resizeValue));
+                this.height = (long)(Math.ceil(rectangle.height/App.resizeValue));
         } catch (AWTException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
@@ -214,8 +214,8 @@ public class ImageClient extends BaseThread
     
      public BufferedImage getScreen() {
         BufferedImage img = robot.createScreenCapture(rectangle);
-        int newW = (int) (Toolkit.getDefaultToolkit().getScreenSize().getWidth()/resizeValue);
-        int newH = (int) (Toolkit.getDefaultToolkit().getScreenSize().getHeight()/resizeValue);
+        int newW = (int) (Math.ceil(Toolkit.getDefaultToolkit().getScreenSize().getWidth()/App.resizeValue));
+        int newH = (int) (Math.ceil(Toolkit.getDefaultToolkit().getScreenSize().getHeight()/App.resizeValue));
         Image tmp = img.getScaledInstance(newW,newH,Image.SCALE_FAST);
         BufferedImage dimg = new BufferedImage(newW,newH,BufferedImage.TYPE_INT_ARGB);
         Graphics2D g2d = dimg.createGraphics();
@@ -409,7 +409,7 @@ public class ImageClient extends BaseThread
                                     screenChanges
                                         = App.rmiClient.getChangeColumns(imageKey);
                                 }
-                                remoteViewer.setImageChanges(screenChanges);
+                                    remoteViewer.setImageChanges(screenChanges);
                             
                                 } catch (RemoteException ex) {
                                     ex.printStackTrace();
@@ -444,13 +444,13 @@ public class ImageClient extends BaseThread
     }
     
     private int getHeight(){
-        Dimension dim=Toolkit.getDefaultToolkit().getScreenSize();
-        return dim.height;
+//        Dimension dim=Toolkit.getDefaultToolkit().getScreenSize();
+        return (int) this.height;
     }
     
     private int getWidth(){
-        Dimension dim=Toolkit.getDefaultToolkit().getScreenSize();
-        return dim.width;
+//        Dimension dim=Toolkit.getDefaultToolkit().getScreenSize();
+        return (int) this.width;
     }
     private long lastImageDataTimeProcess = 0l;
     private void updateLastSessionDate(){

@@ -5,16 +5,22 @@
  */
 package com.mayforever.ceredeclient;
 
+import com.mayforever.cerede.protocol.ClipboardInvoke;
 import com.mayforever.cerede.protocol.Command;
 import com.mayforever.cerede.protocol.CommandRequest;
 import com.mayforever.cerede.protocol.ImageRequest;
 import com.mayforever.cerede.protocol.ImageResponse;
+import com.mayforever.ceredeclient.device.Clipboard;
 import com.mayforever.queue.Queue;
 import com.mayforever.thread.BaseThread;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.Toolkit;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.FlavorEvent;
+import java.awt.datatransfer.FlavorListener;
+import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -27,6 +33,7 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
+import java.rmi.RemoteException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -63,18 +70,55 @@ public class RemoteViewer extends javax.swing.JFrame
         initComponents();
         
         loadingFrame = new LoadingFrame();
-        logger.debug("Maximum loading frame progress :" + loadingFrame.getjProgressBar().getMaximum());
-        logger.debug("Manimum loading frame progress :" + loadingFrame.getjProgressBar().getMinimum());
+        logger.debug("Maximum loading frame progress :" 
+                + loadingFrame.getjProgressBar().getMaximum());
+        logger.debug("Manimum loading frame progress :" 
+                + loadingFrame.getjProgressBar().getMinimum());
         queueCommandRequest = new Queue<>();
         commandSender = new CommandSender();
         this.hash = hash;
         this.jPanel1.addMouseListener(this);
         this.jPanel1.addMouseMotionListener(this);
-        
+//        Clipboard clipboard = new Clipboard(App.hash, this.hash,
+//                Toolkit.getDefaultToolkit().getSystemClipboard());
+        Toolkit.getDefaultToolkit().getSystemClipboard().addFlavorListener(new FlavorListener() {
+            
+           
+            @Override
+            public void flavorsChanged(FlavorEvent fe) {
+                //To change body of generated methods, choose Tools | Templates.
+                try {
+                    String key_= App.toHash(App.hash+hash);
+                    String clipboardText = (String) Toolkit.getDefaultToolkit().getSystemClipboard().getData(DataFlavor.stringFlavor);
+                    logger.info("ClipBoard UPDATED:" + clipboardText);
+                    App.rmiClient.addClipboard(key_, clipboardText);
+                } catch (RemoteException ex) {
+        //            Logger.getLogger(Clipboard.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (UnsupportedFlavorException ex) {
+                    logger.warn(ex);
+                    ex.printStackTrace();
+                } catch (IOException ex) {
+                    logger.warn(ex.getMessage());
+                    ex.printStackTrace();
+                }
+                ClipboardInvoke clipboardInvoke= new ClipboardInvoke();
+                clipboardInvoke.setProtocol((byte) 7);
+                clipboardInvoke.setCommand((byte)0);
+                clipboardInvoke.setHash(hash);
+                clipboardInvoke.setRequestorHash(App.hash);
+
+
+                App.commandClient.sendClipboardInvoke(clipboardInvoke);
+                logger.info("ClipBoard Send" );
+            }
+        });
         this.showRemoteViewer();
         
         this.addKeyListener(this);
         this.addWindowListener(this);
+        
+        // TO LISTEN IN TAB BUTTON
+        this.setFocusTraversalKeysEnabled(false);
     }
 
     /**
@@ -122,7 +166,8 @@ public class RemoteViewer extends javax.swing.JFrame
     public void run(){
         
         Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
-        this.setLocation(dim.width/2-this.getSize().width/2, dim.height/2-this.getSize().height/2);
+        this.setLocation(dim.width/2-this.getSize().width/2,
+                dim.height/2-this.getSize().height/2);
         
         this.loadingFrame.setVisible(true);
         this.loadingFrame.getjLprocess().setText("Sending Request To Server ...");
@@ -151,7 +196,8 @@ public class RemoteViewer extends javax.swing.JFrame
     public void setImageChanges(HashMap<Short, HashMap<Short, Integer>> changesMap){
 //        boolean noOldBuffer = 
         if(oldBufferdImage== null){
-             oldBufferdImage = new BufferedImage((int)(WIDTH/1.5),(int)( HEIGHT/1.5), Image.SCALE_FAST);
+//             oldBufferdImage = new BufferedImage((int)(WIDTH/1.5),(int)( HEIGHT/1.5), Image.SCALE_FAST);
+             oldBufferdImage = new BufferedImage(WIDTH, HEIGHT, Image.SCALE_FAST);
         }
         for(Map.Entry<Short, HashMap<Short, Integer>> entry : changesMap.entrySet()) {
             int columnkey = entry.getKey();
@@ -183,7 +229,10 @@ public class RemoteViewer extends javax.swing.JFrame
     public void updateJScrollViewSize(ImageResponse imageResponse){
         logger.debug("Processing image Response...");
         if((WIDTH != imageResponse.getWidth()) && (HEIGHT != imageResponse.getHeight())){
-            getjPanel1().setPreferredSize(new Dimension(imageResponse.getWidth(),imageResponse.getHeight()));
+            Dimension dimension = new Dimension(imageResponse.getWidth(),imageResponse.getHeight());
+            getjPanel1().setPreferredSize(dimension);
+            this.setSize(dimension);
+            this.setMaximumSize(dimension);
             WIDTH = imageResponse.getWidth();
             HEIGHT = imageResponse.getHeight();
             
@@ -204,7 +253,7 @@ public class RemoteViewer extends javax.swing.JFrame
         //To change body of generated methods, choose Tools | Templates.
         mouseX = e.getX();
         mouseY = e.getY();
-//        System.out.println(InputEvent.getMaskForButton(e.getButton()));
+        
         CommandRequest commandRequest = new CommandRequest();
         commandRequest.setProtocol((byte)6);
         commandRequest.setCommand(Command.MOUSE_MOVE);
@@ -225,6 +274,10 @@ public class RemoteViewer extends javax.swing.JFrame
     @Override
     public void mouseMoved(MouseEvent e) {
         //To change body of generated methods, choose Tools | Templates.
+//        mouseX = (int) (e.getX()*1.5);
+//        mouseY = (int) (e.getY()*1.5);
+//        System.out.println("Mouse at x "+mouseX);
+//        System.out.println("Mouser at x / 1.5 = "+((int)mouseX/1.5));
         mouseX = e.getX();
         mouseY = e.getY();
         CommandRequest commandRequest = new CommandRequest();
