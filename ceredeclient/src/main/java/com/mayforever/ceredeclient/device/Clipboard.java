@@ -48,17 +48,18 @@ public class Clipboard extends BaseThread
     public void flavorsChanged(FlavorEvent fe) {
        
         try {
-            String clipboardText = (String) this.clipboard_.getData(DataFlavor.stringFlavor);
-            this.logger.info("ClipBoard UPDATED:" + clipboardText);
+           // String clipboardText = (String) this.clipboard_.getData(DataFlavor.stringFlavor);
+           String clipboardText = (String) this.clipboard_.getContents(null).getTransferData(DataFlavor.stringFlavor); 
+           this.logger.info("ClipBoard UPDATED:" + clipboardText);
             App.rmiClient.addClipboard(key_, clipboardText);
         } catch (RemoteException ex) {
 //            Logger.getLogger(Clipboard.class.getName()).log(Level.SEVERE, null, ex);
         } catch (UnsupportedFlavorException ex) {
             logger.warn(ex);
-            ex.printStackTrace();
+//            ex.printStackTrace();
         } catch (IOException ex) {
             logger.warn(ex.getMessage());
-            ex.printStackTrace();
+//            ex.printStackTrace();
         }
         ClipboardInvoke clipboardInvoke= new ClipboardInvoke();
         clipboardInvoke.setProtocol((byte) 7);
