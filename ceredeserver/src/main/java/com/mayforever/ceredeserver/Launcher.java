@@ -12,7 +12,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.FileSystemXmlApplicationContext;
 
 import com.mayforever.cerede.data.TCPData;
-import com.mayforever.cerede.rmi.RmiImageServer;
+import com.mayforever.cerede.rmi.RmiServer;
 import com.mayforever.ceredeserver.conf.Configuration;
 import com.mayforever.ceredeserver.conn.TCPServer;
 import com.mayforever.ceredeserver.session.SessionProcessor;
@@ -31,7 +31,7 @@ public class Launcher
 	public static Logger logger = Logger.getLogger("MAIN");
 	public static String logsConfigPath = "";
 	public static Queue<byte[]> dataProcess = null;
-	public static RmiImageServer rmiImageServer= null; 
+	public static RmiServer rmiImageServer= null; 
 	
 	
 	public static void main(String[] args)
@@ -58,7 +58,7 @@ public class Launcher
     	logger.info("waiting for client to connect");
     	
     	
-		rmiImageServer = new RmiImageServer(config.getRmiPort(), config.getAddress());
+		rmiImageServer = new RmiServer(config.getRmiPort(), config.getAddress());
 		logger.info("The rmi server has been lunched at port "+config.getRmiPort()+" with address of "+ config.getAddress());
     	logger.info("rmi server waiting for client to connect");
 		

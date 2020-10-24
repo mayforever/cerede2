@@ -5,7 +5,6 @@
  */
 package com.mayforever.ceredeclient;
 
-import com.mayforever.cerede.rmi.BaseImageInterface;
 import com.mayforever.ceredeclient.conf.Configuration;
 import com.mayforever.ceredeclient.conn.CommandClient;
 import com.mayforever.ceredeclient.conn.ImageClient;
@@ -25,6 +24,7 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.FileSystemXmlApplicationContext;
+import com.mayforever.cerede.rmi.InterfaceImage;
 
 /**
  *
@@ -44,7 +44,7 @@ public class App {
     public static String hash = null;
     public static Map<String, RemoteViewer> mapRemoteViewer = null;
     public static Configuration config = null;
-    public static BaseImageInterface rmiClient = null;
+    public static InterfaceImage rmiClient = null;
     public static float resizeValue = 1.5f;
     public static void main(String[]  arg0){
         ApplicationContext applicationContextLauncher = null;
@@ -74,7 +74,7 @@ public class App {
         mapRemoteViewer = new HashMap<String, RemoteViewer>();
         
         try {
-            rmiClient = (BaseImageInterface) Naming.lookup("rmi://"+config.getServerAddress()+
+            rmiClient = (InterfaceImage) Naming.lookup("rmi://"+config.getServerAddress()+
                     ":"+config.getRmiServerPort()+"/cerede");
             logger.info("RMI Client has been created");
         } catch (NotBoundException ex) {

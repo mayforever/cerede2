@@ -8,7 +8,6 @@ package com.mayforever.ceredeclient.conn;
 import com.mayforever.cerede.protocol.AccessRequest;
 import com.mayforever.cerede.protocol.ImageRequest;
 import com.mayforever.cerede.protocol.ImageResponse;
-import com.mayforever.cerede.rmi.BaseImageInterface;
 import com.mayforever.ceredeclient.App;
 import com.mayforever.ceredeclient.RemoteViewer;
 import com.mayforever.queue.Queue;
@@ -37,6 +36,7 @@ import java.util.HashMap;
 import java.util.logging.Level;
 import javax.imageio.ImageIO;
 import org.apache.log4j.Logger;
+import com.mayforever.cerede.rmi.InterfaceImage;
 
 /**
  *
@@ -356,7 +356,7 @@ public class ImageClient extends BaseThread
                         try {
                             logger.debug("the address was "+"//"+App.config.getServerAddress()+
                                 ":"+App.config.getRmiServerPort()+"/cerede");
-                            App.rmiClient = (BaseImageInterface) Naming.lookup("//"+App.config.getServerAddress()+
+                            App.rmiClient = (InterfaceImage) Naming.lookup("//"+App.config.getServerAddress()+
                                 ":"+App.config.getRmiServerPort()+"/cerede");
                             HashMap<Short, HashMap<Short, Integer>> blockChanged = getBlockChanges
                                         (oldBufferImage, gettingScreenShot());
@@ -400,7 +400,7 @@ public class ImageClient extends BaseThread
                             
                             remoteViewer.updateJScrollViewSize(imageResponse);
                             try {
-                                App.rmiClient = (BaseImageInterface) Naming.lookup("rmi://"+App.config.getServerAddress()+
+                                App.rmiClient = (InterfaceImage) Naming.lookup("rmi://"+App.config.getServerAddress()+
                                 ":"+App.config.getRmiServerPort()+"/cerede");
                                 HashMap<Short, HashMap<Short, Integer>> screenChanges
                                         = App.rmiClient.getChangeColumns(imageKey);

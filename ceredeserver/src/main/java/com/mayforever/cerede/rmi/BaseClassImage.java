@@ -7,7 +7,7 @@ import java.util.HashMap;
 import com.mayforever.cerede.data.TCPData;
 import com.mayforever.ceredeserver.Launcher;
 
-public class BaseClassImage  extends UnicastRemoteObject implements BaseImageInterface{
+public class BaseClassImage  extends UnicastRemoteObject implements InterfaceImage{
 	protected BaseClassImage() throws RemoteException {
 		super();
 		

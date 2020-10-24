@@ -7,6 +7,8 @@ import org.apache.log4j.Logger;
 
 import com.mayforever.cerede.protocol.ClipboardInvoke;
 import com.mayforever.cerede.protocol.CommandRequest;
+import com.mayforever.cerede.protocol.FileTransferRequest;
+import com.mayforever.cerede.protocol.FileTransferResponse;
 import com.mayforever.cerede.protocol.ImageRequest;
 import com.mayforever.cerede.protocol.ImageResponse;
 import com.mayforever.ceredeserver.Launcher;
@@ -106,12 +108,50 @@ public class SessionProcessor extends com.mayforever.thread.BaseThread{
 							}
 						}
 					}
-//					else if(data[0] == 4){
-//						
-//					}
-//					else if(data[0] == 5){
-//						
-//					}
+					else if(data[0] == 4){
+						logger.debug("file request to process");
+						FileTransferRequest fileTransferRequest = new FileTransferRequest();
+						fileTransferRequest.fromBytes(data);
+						
+						if(Launcher.controllerMap.containsKey(fileTransferRequest.getHash())) {
+							try {
+								
+									Launcher.controllerMap.get(fileTransferRequest.getHash()).getTcpCommandListener()
+										.getTcpClient().sendPacket(data);
+								
+								
+							} catch (IOException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}catch(NullPointerException npe) {
+								
+							}
+						}else {
+							
+						}
+					}
+					else if(data[0] == 5){
+						logger.debug("file response to process");
+						FileTransferResponse fileTransferResponse = new FileTransferResponse();
+						fileTransferResponse.fromBytes(data);
+						
+						if(Launcher.controllerMap.containsKey(fileTransferResponse.getRequestorHash())) {
+							try {
+								
+									Launcher.controllerMap.get(fileTransferResponse.getRequestorHash()).getTcpCommandListener()
+										.getTcpClient().sendPacket(data);
+								
+								
+							} catch (IOException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}catch(NullPointerException npe) {
+								
+							}
+						}else {
+							
+						}
+					}
 					else if(data[0] ==6){
 						CommandRequest commandRequest = new CommandRequest();
 						commandRequest.fromBytes(data);

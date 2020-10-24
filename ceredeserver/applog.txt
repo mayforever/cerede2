@@ -1,0 +1,4 @@
+INFO    2020-10-22 09:32:41,523 [main] MAIN  - The server has been lunched at port 4452 with address of 192.168.0.23
+INFO    2020-10-22 09:32:41,525 [main] MAIN  - waiting for client to connect
+INFO    2020-10-22 09:32:41,730 [main] MAIN  - The rmi server has been lunched at port 4453 with address of 192.168.0.23
+INFO    2020-10-22 09:32:41,730 [main] MAIN  - rmi server waiting for client to connect
